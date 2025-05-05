@@ -1,21 +1,22 @@
 from ExpressionTree import tree_size
-from RandomTreeGeneration import generate_random_tree, p_leaf_at_depth
+from Canonicalization import canonicalize
 import math
 
-def fitness_parsimony(tree, data_points, target_values, lambda_parsimony=0.01):
+def fitness_canonicalization(tree, data_points, target_values, lambda_parsimony=0.01):
+    tree = canonicalize(tree)
     mse = 0.0
     for point, target in zip(data_points, target_values):
         try:
             pred = tree.evaluate(point)
         except Exception:
-            return float('inf')  # badly formed tree, penalize heavily
+            return float('inf'), float('inf')  # both fitness and mse are infinite
+
         mse += (pred - target) ** 2
     mse /= len(data_points)
 
-    # Add complexity penalty
     complexity = tree_size(tree)
-    return mse + (lambda_parsimony * complexity)
-
+    fitness = mse + (lambda_parsimony * complexity)
+    return fitness, mse
 
 
 # Example data points:

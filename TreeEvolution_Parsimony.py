@@ -80,7 +80,7 @@ def get_tree_depth(tree):
         return 1 + max(get_tree_depth(child) for child in tree.children)
     else:
         return 1
-def crossover_with_depth_control(parent1, parent2, max_depth):
+def crossover_with_depth_control(parent1, parent2, max_depth, variables, operators):
     for _ in range(5):  # try up to 5 times
         child = crossover(parent1, parent2)
         if get_tree_depth(child) <= max_depth:
@@ -120,7 +120,7 @@ class Population:
             while len(new_trees) < self.size: #keep creating offspring until population is full again
                 parent1 = tournament_selection(self.trees, self.scores, tournament_size)
                 parent2 = tournament_selection(self.trees, self.scores, tournament_size)
-                child = crossover_with_depth_control(parent1, parent2, self.max_depth)
+                child = crossover_with_depth_control(parent1, parent2, self.max_depth, self.variables, self.operators)
                 child = mutate(child, self.max_depth, self.variables, self.operators, mutation_rate)
                 new_trees.append(child) #add final child to next pop.
 
@@ -128,44 +128,44 @@ class Population:
             self.evaluate()
             
             best_tree, best_fitness, best_mse = self.best_tree()
-            print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
+            #print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
             
 
 
 
 
 
-# Define target function: f(x) = x(x+1)/2
-def target_fn(x):
-    return (x*(x+1)/2)
+# # Define target function: f(x) = x(x+1)/2
+# def target_fn(x):
+#     return (x*(x+1)/2)
 
-# Generate training data
-data_points = [{'x': i} for i in range(50)]  # Inputs: x = 0 to 19
-target_values = [target_fn(dp['x']) for dp in data_points]
+# # Generate training data
+# data_points = [{'x': i} for i in range(50)]  # Inputs: x = 0 to 19
+# target_values = [target_fn(dp['x']) for dp in data_points]
 
-# Define problem parameters
-variables = ['x']
-operators = ['+', '-', '*', '/', 'sin']
-max_depth = 10
-lambda_parsimony = 0.5
+# # Define problem parameters
+# variables = ['x']
+# operators = ['+', '-', '*', '/', 'sin']
+# max_depth = 10
+# lambda_parsimony = 0.5
 
-# Initialize and evolve population
-pop = Population(
-    size=200,
-    max_depth=max_depth,
-    variables=variables,
-    operators=operators,
-    data_points=data_points,
-    target_values=target_values,
-    lambda_parsimony=lambda_parsimony
-)
+# # Initialize and evolve population
+# pop = Population(
+#     size=200,
+#     max_depth=max_depth,
+#     variables=variables,
+#     operators=operators,
+#     data_points=data_points,
+#     target_values=target_values,
+#     lambda_parsimony=lambda_parsimony
+# )
 
-pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
+# pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
 
-# Output best expression
-best_tree, best_fitness, best_mse = pop.best_tree()
-print("\nBest Expression Found:")
-print(best_tree)
-print("Fitness (with penalty):", best_fitness)
-print("True MSE:", best_mse)
+# # Output best expression
+# best_tree, best_fitness, best_mse = pop.best_tree()
+# print("\nBest Expression Found:")
+# print(best_tree)
+# print("Fitness (with penalty):", best_fitness)
+# print("True MSE:", best_mse)
 
