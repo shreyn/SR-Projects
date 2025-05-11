@@ -135,37 +135,37 @@ class Population:
 
 
 
-# # Define target function: f(x) = x(x+1)/2
-# def target_fn(x):
-#     return (x*(x+1)/2)
+# Define target function: f(x) = x(x+1)/2
+def target_fn(x):
+    return (x*(x+1)/2)
 
-# # Generate training data
-# data_points = [{'x': i} for i in range(50)]  # Inputs: x = 0 to 19
-# target_values = [target_fn(dp['x']) for dp in data_points]
+# Generate training data
+data_points = [{'x': i} for i in range(50)]  # Inputs: x = 0 to 19
+target_values = [target_fn(dp['x']) for dp in data_points]
 
-# # Define problem parameters
-# variables = ['x']
-# operators = ['+', '-', '*', '/', 'sin']
-# max_depth = 10
-# lambda_parsimony = 0.5
+# Define problem parameters
+variables = ['x']
+operators = ['+', '-', '*', '/', 'sin']
+max_depth = 10
+lambda_parsimony = 0.5
 
-# # Initialize and evolve population
-# pop = Population(
-#     size=200,
-#     max_depth=max_depth,
-#     variables=variables,
-#     operators=operators,
-#     data_points=data_points,
-#     target_values=target_values,
-#     lambda_parsimony=lambda_parsimony
-# )
+# Initialize and evolve population
+pop = Population(
+    size=200,
+    max_depth=max_depth,
+    variables=variables,
+    operators=operators,
+    data_points=data_points,
+    target_values=target_values,
+    lambda_parsimony=lambda_parsimony
+)
 
-# pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
+pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
 
-# # Output best expression
+# Output best expression
 # best_tree, best_fitness, best_mse = pop.best_tree()
 # print("\nBest Expression Found:")
 # print(best_tree)
-# print("Fitness (with penalty):", best_fitness)
+# print("Fitness (with parsimony penalty):", best_fitness)
 # print("True MSE:", best_mse)
 

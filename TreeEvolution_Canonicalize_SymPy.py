@@ -97,8 +97,7 @@ class Population:
         self.operators = operators
         self.data_points = data_points
         self.target_values = target_values
-        self.trees = [canonicalize_sympy
-                      (generate_random_tree(max_depth, variables, operators)) for _ in range(size)] ## with canonicalization!
+        self.trees = [generate_random_tree(max_depth, variables, operators) for _ in range(size)]
         self.fitnessmsepairs = [fitness_canonicalization_sympy(tree, self.data_points, self.target_values) for tree in self.trees] 
         self.scores = [pair[0] for pair in self.fitnessmsepairs] #just fitness for selection
 
@@ -123,9 +122,8 @@ class Population:
                 parent1 = tournament_selection(self.trees, self.scores, tournament_size)
                 parent2 = tournament_selection(self.trees, self.scores, tournament_size)
                 child = crossover_with_depth_control(parent1, parent2, self.max_depth, self.variables, self.operators)
-                child = canonicalize_sympy(child) #simplify child
                 child = mutate(child, self.max_depth, self.variables, self.operators, mutation_rate)
-                child = canonicalize_sympy(child) #simplify child
+                _ = canonicalize_sympy(child) #simplify child
                 new_trees.append(child) #add final child to next pop.
 
             self.trees = new_trees #replace old pop. with new pop.
@@ -137,23 +135,23 @@ class Population:
 
 
 
+### TESTING
 
-
-# # Define target function: f(x) = x(x+1)/2
+# # define target function: f(x) = x(x+1)/2
 # def target_fn(x):
 #     return (x*(x+1)/2)
 
-# # Generate training data
-# data_points = [{'x': i} for i in range(50)]  # Inputs: x = 0 to 19
+# # generate training data
+# data_points = [{'x': i} for i in range(20)]  # Inputs: x = 0 to 19
 # target_values = [target_fn(dp['x']) for dp in data_points]
 
-# # Define problem parameters
+# # define problem parameters
 # variables = ['x']
 # operators = ['+', '-', '*', '/', 'sin']
 # max_depth = 10
 # lambda_parsimony = 0.5
 
-# # Initialize and evolve population
+# # initialize and evolve population
 # pop = Population(
 #     size=200,
 #     max_depth=max_depth,
@@ -164,9 +162,9 @@ class Population:
 #     lambda_parsimony=lambda_parsimony
 # )
 
-# pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
+# pop.evolve(generations=200, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
 
-# # Output best expression
+# # output best expression
 # best_tree, best_fitness, best_mse = pop.best_tree()
 # print("\nBest Expression Found:")
 # print(best_tree)

@@ -1,9 +1,9 @@
 import time
 import matplotlib.pyplot as plt
 from TreeEvolution_Parsimony import Population as PopParsimony
-from TreeEvolution_Canonicalize import Population as PopCanon
+from TreeEvolution_Canonicalize_SymPy import Population as PopCanonSymPy
 
-def run_convergence_experiment(PopClass, label, runs=50, mse_threshold=0.01, max_generations=350):
+def run_convergence_experiment(PopClass, label, runs=10, mse_threshold=0.01, max_generations=250):
     generations_to_converge = []
 
     for run in range(runs):
@@ -14,8 +14,8 @@ def run_convergence_experiment(PopClass, label, runs=50, mse_threshold=0.01, max
         target_values = [target_fn(dp['x']) for dp in data_points]
 
         pop = PopClass(
-            size=200,
-            max_depth=15,
+            size=100,
+            max_depth=5,
             variables=['x'],
             operators=['+', '-', '*', '/', 'sin'],
             data_points=data_points,
@@ -36,7 +36,7 @@ def run_convergence_experiment(PopClass, label, runs=50, mse_threshold=0.01, max
 
 
 gens_parsimony = run_convergence_experiment(PopParsimony, "Parsimony Only")
-gens_canonical = run_convergence_experiment(PopCanon, "Canonicalization")
+gens_canonical = run_convergence_experiment(PopCanonSymPy, "Canonicalization")
 
 
 plt.boxplot([gens_parsimony, gens_canonical], labels=["Parsimony", "Canonicalization"])
