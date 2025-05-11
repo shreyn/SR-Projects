@@ -1,9 +1,9 @@
 from ExpressionTree import tree_size
-from Canonicalization_SymPy import canonicalize_sympy
+from Canonicalization_Customv1 import simplify
 import math
 
-def fitness_canonicalization(tree, data_points, target_values, lambda_parsimony=0.01):
-    tree = canonicalize_sympy(tree)
+def fitness_canonicalization_customv1(tree, data_points, target_values, lambda_parsimony=0.01):
+    tree = simplify(tree)
     mse = 0.0
     for point, target in zip(data_points, target_values):
         try:

@@ -1,3 +1,12 @@
+
+"""
+THIS IS INSANELY SLOW. 
+Why?:
+sp.simplify() is very expensive (tries many different algebraic methods (factoring, trigsimp, cancel, etc))
+simplify() is called on every child after mutation (so is called hundreds of times per generation)
+these expressions are not cached.
+"""
+
 import sympy as sp
 from ExpressionTree import ConstantNode, VariableNode, OperatorNode
 

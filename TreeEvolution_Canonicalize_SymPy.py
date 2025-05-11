@@ -1,3 +1,11 @@
+"""
+THIS IS INSANELY SLOW. 
+Why?:
+sp.simplify() is very expensive (tries many different algebraic methods (factoring, trigsimp, cancel, etc))
+simplify() is called on every child after mutation (so is called hundreds of times per generation)
+these expressions are not cached.
+"""
+
 from FitnessFunction_Canonicalization_SymPy import fitness_canonicalization_sympy
 from RandomTreeGeneration import generate_random_tree
 from ExpressionTree import OperatorNode, tree_size
@@ -130,44 +138,44 @@ class Population:
             self.evaluate()
             
             best_tree, best_fitness, best_mse = self.best_tree()
-            #print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
+            print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
             
 
 
 
-### TESTING
+## TESTING
 
-# # define target function: f(x) = x(x+1)/2
-# def target_fn(x):
-#     return (x*(x+1)/2)
+# define target function: f(x) = x(x+1)/2
+def target_fn(x):
+    return (x*(x+1)/2)
 
-# # generate training data
-# data_points = [{'x': i} for i in range(20)]  # Inputs: x = 0 to 19
-# target_values = [target_fn(dp['x']) for dp in data_points]
+# generate training data
+data_points = [{'x': i} for i in range(20)]  # Inputs: x = 0 to 19
+target_values = [target_fn(dp['x']) for dp in data_points]
 
-# # define problem parameters
-# variables = ['x']
-# operators = ['+', '-', '*', '/', 'sin']
-# max_depth = 10
-# lambda_parsimony = 0.5
+# define problem parameters
+variables = ['x']
+operators = ['+', '-', '*', '/', 'sin']
+max_depth = 10
+lambda_parsimony = 0.5
 
-# # initialize and evolve population
-# pop = Population(
-#     size=200,
-#     max_depth=max_depth,
-#     variables=variables,
-#     operators=operators,
-#     data_points=data_points,
-#     target_values=target_values,
-#     lambda_parsimony=lambda_parsimony
-# )
+# initialize and evolve population
+pop = Population(
+    size=200,
+    max_depth=max_depth,
+    variables=variables,
+    operators=operators,
+    data_points=data_points,
+    target_values=target_values,
+    lambda_parsimony=lambda_parsimony
+)
 
-# pop.evolve(generations=200, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
+pop.evolve(generations=200, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
 
-# # output best expression
-# best_tree, best_fitness, best_mse = pop.best_tree()
-# print("\nBest Expression Found:")
-# print(best_tree)
-# print("Fitness (with penalty):", best_fitness)
-# print("True MSE:", best_mse)
+# output best expression
+best_tree, best_fitness, best_mse = pop.best_tree()
+print("\nBest Expression Found:")
+print(best_tree)
+print("Fitness (with penalty):", best_fitness)
+print("True MSE:", best_mse)
 

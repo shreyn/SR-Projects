@@ -1,9 +1,14 @@
-from FitnessFunction_Canonicalization_SymPy import fitness_canonicalization_sympy
+"""
+MUCH FASTER!
+However, need to manually add rules
+"""
+
+from FitnessFunction_Canonicalization_Customv1 import fitness_canonicalization_customv1
 from RandomTreeGeneration import generate_random_tree
 from ExpressionTree import OperatorNode, tree_size
 import random
 import copy
-from Canonicalization_SymPy import canonicalize_sympy 
+from Canonicalization_Customv1 import simplify
 import math
 
 def mutate(tree, max_depth, variables, operators,  mutation_rate):
@@ -97,13 +102,12 @@ class Population:
         self.operators = operators
         self.data_points = data_points
         self.target_values = target_values
-        self.trees = [canonicalize_sympy
-                      (generate_random_tree(max_depth, variables, operators)) for _ in range(size)] ## with canonicalization!
-        self.fitnessmsepairs = [fitness_canonicalization_sympy(tree, self.data_points, self.target_values) for tree in self.trees] 
+        self.trees = [generate_random_tree(max_depth, variables, operators) for _ in range(size)]
+        self.fitnessmsepairs = [fitness_canonicalization_customv1(tree, self.data_points, self.target_values) for tree in self.trees] 
         self.scores = [pair[0] for pair in self.fitnessmsepairs] #just fitness for selection
 
     def evaluate(self): #for recalculating fitness scores for trees (updates self.scores using latest self.trees)
-        self.fitnessmsepairs = [fitness_canonicalization_sympy(tree, self.data_points, self.target_values) for tree in self.trees]
+        self.fitnessmsepairs = [fitness_canonicalization_customv1(tree, self.data_points, self.target_values) for tree in self.trees]
         self.scores = [pair[0] for pair in self.fitnessmsepairs]
 
     def best_tree(self): #best tree and its score
@@ -123,37 +127,36 @@ class Population:
                 parent1 = tournament_selection(self.trees, self.scores, tournament_size)
                 parent2 = tournament_selection(self.trees, self.scores, tournament_size)
                 child = crossover_with_depth_control(parent1, parent2, self.max_depth, self.variables, self.operators)
-                child = canonicalize_sympy(child) #simplify child
                 child = mutate(child, self.max_depth, self.variables, self.operators, mutation_rate)
-                child = canonicalize_sympy(child) #simplify child
+                child = simplify(child) #simplify child
                 new_trees.append(child) #add final child to next pop.
 
             self.trees = new_trees #replace old pop. with new pop.
             self.evaluate()
             
             best_tree, best_fitness, best_mse = self.best_tree()
-            #print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
+            # print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
             
 
 
 
+# ## TESTING
 
-
-# # Define target function: f(x) = x(x+1)/2
+# # define target function: f(x) = x(x+1)/2
 # def target_fn(x):
-#     return (x*(x+1)/2)
+#     return (x*(x+1))/2
 
-# # Generate training data
-# data_points = [{'x': i} for i in range(50)]  # Inputs: x = 0 to 19
+# # generate training data
+# data_points = [{'x': i} for i in range(20)]  # Inputs: x = 0 to 19
 # target_values = [target_fn(dp['x']) for dp in data_points]
 
-# # Define problem parameters
+# # define problem parameters
 # variables = ['x']
 # operators = ['+', '-', '*', '/', 'sin']
 # max_depth = 10
 # lambda_parsimony = 0.5
 
-# # Initialize and evolve population
+# # initialize and evolve population
 # pop = Population(
 #     size=200,
 #     max_depth=max_depth,
@@ -164,9 +167,9 @@ class Population:
 #     lambda_parsimony=lambda_parsimony
 # )
 
-# pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
+# pop.evolve(generations=200, tournament_size=5, elite_fraction=0.1, mutation_rate=0.1)
 
-# # Output best expression
+# # output best expression
 # best_tree, best_fitness, best_mse = pop.best_tree()
 # print("\nBest Expression Found:")
 # print(best_tree)

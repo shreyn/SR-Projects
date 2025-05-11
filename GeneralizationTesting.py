@@ -1,12 +1,15 @@
-
+"""
+Originally tried SymPy, was way too slow.
+Now testing Customv1 (manual rules) vs. no canon (parsimony)
+"""
 ## testing how "good" canon is, for a diverse group of functions
 
 import math
 from TreeEvolution_Parsimony import Population as PopParsimony
-from TreeEvolution_Canonicalize_SymPy import Population as PopCanonical
+from TreeEvolution_Canonicalize_Customv1 import Population as PopCanonical
 
 
-def test_function_convergence(PopClass, target_fn, mse_threshold=0.01, max_generations=250, runs=20):
+def test_function_convergence(PopClass, target_fn, mse_threshold=0.01, max_generations=200, runs=20):
     results = []
     for run in range(runs):
         data_points = [{'x': i} for i in range(30)]
@@ -23,7 +26,7 @@ def test_function_convergence(PopClass, target_fn, mse_threshold=0.01, max_gener
         )
 
         for gen in range(max_generations):
-            pop.evolve(generations=1, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
+            pop.evolve(generations=1, tournament_size=5, elite_fraction=0.1, mutation_rate=0.1)
             _, _, mse = pop.best_tree()
             if mse <= mse_threshold:
                 results.append((True, gen + 1, mse))
