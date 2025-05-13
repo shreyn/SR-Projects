@@ -1,6 +1,8 @@
 """
 MUCH FASTER!
 However, need to manually add rules
+
+Simplification here! (changing the actual tree itself)
 """
 
 from FitnessFunction_Canonicalization_Customv1 import fitness_canonicalization_customv1
@@ -9,7 +11,7 @@ from ExpressionTree import OperatorNode, tree_size
 import random
 import copy
 from Canonicalization_Customv1 import simplify
-import math
+
 
 def mutate(tree, max_depth, variables, operators,  mutation_rate):
     #At root: mutation_rate chance of replacing entire tree.

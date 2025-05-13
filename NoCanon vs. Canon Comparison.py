@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from TreeEvolution_Parsimony import Population as PopParsimony
 from TreeEvolution_Canonicalize_Customv1 import Population as PopCanonSymPy
 
-def run_convergence_experiment(PopClass, label, runs=20, mse_threshold=0.01, max_generations=250):
+def run_convergence_experiment(PopClass, label, runs=10, mse_threshold=0.001, max_generations=200):
     generations_to_converge = []
 
     for run in range(runs):
@@ -15,7 +15,7 @@ def run_convergence_experiment(PopClass, label, runs=20, mse_threshold=0.01, max
 
         pop = PopClass(
             size=200,
-            max_depth=10,
+            max_depth=7,
             variables=['x'],
             operators=['+', '-', '*', '/', 'sin'],
             data_points=data_points,
@@ -38,9 +38,8 @@ def run_convergence_experiment(PopClass, label, runs=20, mse_threshold=0.01, max
 gens_parsimony = run_convergence_experiment(PopParsimony, "Parsimony Only")
 gens_canonical = run_convergence_experiment(PopCanonSymPy, "Canonicalization")
 
-
 plt.boxplot([gens_parsimony, gens_canonical], labels=["Parsimony", "Canonicalization"])
-plt.ylabel("Generations to Reach MSE ≤ 0.01")
+plt.ylabel("Generations to Reach MSE ≤ 0.001")
 plt.title("Convergence Comparison (20 Runs)")
 plt.grid(True)
 plt.show()

@@ -1,6 +1,8 @@
 """
 MUCH FASTER!
 However, need to manually add rules
+
+No simplification here!
 """
 
 from ExpressionTree import ConstantNode, VariableNode, OperatorNode

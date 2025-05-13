@@ -1,9 +1,15 @@
+"""
+VERY IMPORTANT DISTINCTION:
+No simplification here! (since the actual tree is being altered already).
+This is different from SymPy, since for that, the tree is not being altered, and simplification is only used in fitness.
+
+"""
+
 from ExpressionTree import tree_size
 from Canonicalization_Customv1 import simplify
 import math
 
 def fitness_canonicalization_customv1(tree, data_points, target_values, lambda_parsimony=0.01):
-    tree = simplify(tree)
     mse = 0.0
     for point, target in zip(data_points, target_values):
         try:
