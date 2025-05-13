@@ -3,8 +3,7 @@ Read TreeEvolution_Canonicalize_SymPy.py
 """
 
 import sympy as sp
-from ExpressionTree import ConstantNode, VariableNode, OperatorNode
-
+from SR_Setup.ExpressionTree import ConstantNode, VariableNode, OperatorNode
 
 def tree_to_sympy(tree):
     if isinstance(tree, ConstantNode):

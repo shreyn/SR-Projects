@@ -1,5 +1,5 @@
 import random
-from ExpressionTree import Node, ConstantNode, VariableNode, OperatorNode
+from SR_Setup.ExpressionTree import Node, ConstantNode, VariableNode, OperatorNode
 
 def generate_random_tree(max_depth, variables, operators, current_depth=0):
     p_leaf = p_leaf_at_depth(current_depth, max_depth)

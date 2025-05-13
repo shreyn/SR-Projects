@@ -21,9 +21,9 @@ Instead, we only use simplify in fitness, since this will ensure that equivalent
 
 """
 
-from FitnessFunction_Canonicalization_SymPy import fitness_canonicalization_sympy
-from RandomTreeGeneration import generate_random_tree
-from ExpressionTree import OperatorNode, tree_size
+from Canonicalization.FitnessFunction_Canon_SymPy import fitness_canonicalization_sympy
+from SR_Setup.RandomTreeGeneration import generate_random_tree
+from SR_Setup.ExpressionTree import OperatorNode, tree_size
 import random
 import copy
 

@@ -1,5 +1,4 @@
-from ExpressionTree import tree_size
-import math
+from SR_Setup.ExpressionTree import tree_size
 
 def fitness_parsimony(tree, data_points, target_values, lambda_parsimony=0.01):
     mse = 0.0

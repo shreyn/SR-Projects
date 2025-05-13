@@ -5,8 +5,8 @@ Now testing Customv1 (manual rules) vs. no canon (parsimony)
 ## testing how "good" canon is, for a diverse group of functions
 
 import math
-from TreeEvolution_Parsimony import Population as PopParsimony
-from TreeEvolution_Canonicalize_Customv1 import Population as PopCanonical
+from Evolution.TreeEvolution import Population as PopParsimony
+from Evolution.TreeEvolution_Canon_Customv1 import Population as PopCanonical
 
 
 def test_function_convergence(PopClass, target_fn, mse_threshold=0.01, max_generations=200, runs=20):

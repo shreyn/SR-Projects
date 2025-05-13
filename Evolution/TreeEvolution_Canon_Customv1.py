@@ -5,12 +5,12 @@ However, need to manually add rules
 Simplification here! (changing the actual tree itself)
 """
 
-from FitnessFunction_Canonicalization_Customv1 import fitness_canonicalization_customv1
-from RandomTreeGeneration import generate_random_tree
-from ExpressionTree import OperatorNode, tree_size
+from Canonicalization.FitnessFunction_Canon_Customv1 import fitness_canonicalization_customv1
+from SR_Setup.RandomTreeGeneration import generate_random_tree
+from SR_Setup.ExpressionTree import OperatorNode, tree_size
 import random
 import copy
-from Canonicalization_Customv1 import simplify
+from Canonicalization.Canon_Customv1 import simplify
 
 
 def mutate(tree, max_depth, variables, operators,  mutation_rate):

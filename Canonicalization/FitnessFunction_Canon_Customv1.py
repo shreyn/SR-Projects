@@ -5,9 +5,8 @@ This is different from SymPy, since for that, the tree is not being altered, and
 
 """
 
-from ExpressionTree import tree_size
-from Canonicalization_Customv1 import simplify
-import math
+from SR_Setup.ExpressionTree import tree_size
+from Canonicalization.Canon_Customv1 import simplify
 
 def fitness_canonicalization_customv1(tree, data_points, target_values, lambda_parsimony=0.01):
     mse = 0.0

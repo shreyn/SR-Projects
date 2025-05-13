@@ -1,6 +1,6 @@
-from FitnessFunction_Parsimony import fitness_parsimony
-from RandomTreeGeneration import generate_random_tree
-from ExpressionTree import OperatorNode, tree_size
+from SR_Setup.FitnessFunction_Parsimony import fitness_parsimony
+from SR_Setup.RandomTreeGeneration import generate_random_tree
+from SR_Setup.ExpressionTree import OperatorNode, tree_size
 import random
 import copy
 import math

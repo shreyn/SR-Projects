@@ -2,8 +2,8 @@
 Read TreeEvolution_Canonicalize_SymPy.py  
 """
 
-from ExpressionTree import tree_size
-from Canonicalization_SymPy import canonicalize_sympy
+from SR_Setup.ExpressionTree import tree_size
+from Canonicalization.Canon_SymPy import canonicalize_sympy
 import math
 
 def fitness_canonicalization_sympy(tree, data_points, target_values, lambda_parsimony=0.01):

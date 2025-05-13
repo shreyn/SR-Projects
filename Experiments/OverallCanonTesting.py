@@ -2,9 +2,9 @@ import time
 import math
 import matplotlib.pyplot as plt
 
-from TreeEvolution_Parsimony import Population as PopParsimony
-from TreeEvolution_Canonicalize_Customv1 import Population as PopCanonCustom
-from TreeEvolution_Canonicalize_SymPy import Population as PopCanonSymPy 
+from Evolution.TreeEvolution import Population as PopParsimony
+from Evolution.TreeEvolution_Canon_Customv1 import Population as PopCanonCustom
+from Evolution.TreeEvolution_Canon_SymPy import Population as PopCanonSymPy 
 
 test_functions = {
     "x": lambda x: x,

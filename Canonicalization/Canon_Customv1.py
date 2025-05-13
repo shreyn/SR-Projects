@@ -5,7 +5,7 @@ However, need to manually add rules
 No simplification here!
 """
 
-from ExpressionTree import ConstantNode, VariableNode, OperatorNode
+from SR_Setup.ExpressionTree import ConstantNode, VariableNode, OperatorNode
 import math
 
 def simplify(tree):
