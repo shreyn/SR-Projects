@@ -8,16 +8,14 @@ This repository implements a symbolic regression (SR) system using genetic progr
 
 | Folder             | Description |
 |--------------------|-------------|
-| `Canonicalization/` | Canonicalization strategies |
-| `Evolution/`        | Core GP algorithms |
 | `SR_Setup/`         | Expression trees and random tree generation |
-| `Experiments/`      | Comparison scripts |
+| `Canonicalization/` | Canonicalization strategies |
+| `Evolution/`        | Core GP algorithms (per strategy) |
+| `Experiments/`      | Final comparison scripts |
 
 ---
 
 ## How to Run
-
-Make sure you are in the root directory `SR-Projects/`, then use:
 
 ```bash
 # Final Canonicalization strategy comparison (across many functions)
