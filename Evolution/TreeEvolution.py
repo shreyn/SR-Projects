@@ -39,16 +39,24 @@ def collect_all_nodes(tree):
 def get_random_subtree(tree): 
     return random.choice(collect_all_nodes(tree))
 
+def collect_all_paths(node, path=()):
+    """
+    Returns a list of all paths from root to every node (including internal nodes and leaves).
+    Each path is a tuple of child-indices, e.g. () for the root, (0,2) for root→child0→child2, etc.
+    """
+    paths = [path]
+    if isinstance(node, OperatorNode):
+        for idx, child in enumerate(node.children):
+            paths.extend(collect_all_paths(child, path + (idx,)))
+    return paths
+
 def collect_random_path(tree):
-    #we can't just say "node 7"
-    #we need a way to find that node starting from the root (directions to the crossover point)
-    #this function gives you [0, 1, 0], which says start at root, go to child 0, then child 1, then child 0
-    path = []
-    while isinstance(tree, OperatorNode) and tree.children:
-        idx = random.randint(0, len(tree.children) - 1)
-        path.append(idx)
-        tree = tree.children[idx]
-    return path
+    """
+    Chooses *any* node in the tree (root, internal, or leaf) at random.
+    """
+    all_paths = collect_all_paths(tree)
+    return list(random.choice(all_paths))
+
 def replace_subtree(tree, path, new_subtree):
     #walks along the path
     #replaces node found at the end of the path with the new_subtree
@@ -128,7 +136,7 @@ class Population:
             self.evaluate()
             
             best_tree, best_fitness, best_mse = self.best_tree()
-            print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
+            # print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
             
 
 
@@ -142,7 +150,7 @@ class Population:
 
 # # Define problem parameters
 # variables = ['x']
-# operators = ['+', '-', '*', '/', 'sin', 'cos', 'log', 'exp', 'abs', 'sqrt', '^', 'max', 'min']
+# operators = ['+', '-', '*', '/', 'sin', 'cos', 'log', 'exp', '^']
 # max_depth = 10
 # lambda_parsimony = 0.5
 

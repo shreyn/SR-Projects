@@ -1,13 +1,23 @@
 import random
 from SR_Setup.ExpressionTree import operator_arity, Node, ConstantNode, VariableNode, OperatorNode
+import math
+
+def generate_constant_node():
+    if random.random() < 0.5:
+        #fixed set of useful constants
+        value = random.choice([-1, 0, 0.5, 1, 2, math.e, math.pi, 10])
+    else:
+        #wider uniform range with control
+        value = round(random.uniform(-20, 20), 2)
+    return ConstantNode(value)
+
 
 def generate_random_tree(max_depth, variables, operators, current_depth=0):
     p_leaf = p_leaf_at_depth(current_depth, max_depth)
     
     if (current_depth >= max_depth or random.random() < p_leaf):  # leaf node
         if random.random() < 0.3: #constant
-            value = random.uniform(-5, 5)  # float for better generality
-            return ConstantNode(value)
+            return generate_constant_node()    
         else: #var
             variable = random.choice(variables)
             return VariableNode(variable)

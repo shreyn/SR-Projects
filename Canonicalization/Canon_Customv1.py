@@ -44,7 +44,7 @@ def simplify(tree):
 
 
 
-        # General constant folding (any op, if all children are constants)
+        #general constant folding (any op, if all children are constants)
         if all(isinstance(c, ConstantNode) for c in children):
             try:
                 values = [c.val for c in children]
@@ -78,14 +78,14 @@ def simplify(tree):
             except:
                 pass  # fallback to structural
 
-        # Redundancy elimination: x - x = 0, x / x = 1
+        #redundancy elimination: x - x = 0, x / x = 1
         if len(children) == 2 and repr(children[0]) == repr(children[1]):
             if tree.operator == '-':
                 return ConstantNode(0)
             elif tree.operator == '/':
                 return ConstantNode(1)
 
-        # Constant folding (accumulate constants in +/*)
+        #constant folding (accumulate constants in +/*)
         if tree.operator in ['+', '*']:
             constant_value = 0 if tree.operator == '+' else 1
             new_children = []
@@ -112,11 +112,11 @@ def simplify(tree):
             else:
                 children = new_children
 
-        # Sort commutative children
+        #sort commutative children
         if tree.operator in ['+', '*']:
             children.sort(key=lambda x: repr(x))
 
         return OperatorNode(tree.operator, children)
 
     else:
-        return tree  # Constant or Variable
+        return tree  # constant or variable

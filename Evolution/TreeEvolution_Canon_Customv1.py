@@ -4,30 +4,48 @@ However, need to manually add rules
 
 Simplification here! (changing the actual tree itself)
 """
+
+
 from Canonicalization.FitnessFunction_Canon_Customv1 import fitness_canonicalization_customv1
 from SR_Setup.RandomTreeGeneration import generate_random_tree
-from SR_Setup.ExpressionTree import OperatorNode, tree_size
+from SR_Setup.ExpressionTree import ConstantNode, VariableNode, operator_arity, OperatorNode, tree_size
 import random
 import copy
 from Canonicalization.Canon_Customv1 import simplify
 import math
 
-
-def mutate(tree, max_depth, variables, operators,  mutation_rate):
-    #At root: mutation_rate chance of replacing entire tree.
-    #Else: walk through tree recursively, each OperatorNode has same operator but different subtrees, each leaf can be replaced
-    #Else: return same tree
+def mutate(tree, max_depth, variables, operators, mutation_rate):
+    #Structural +local mutation. applies small changes to nodes with probability = mutation_rate.
+    #basically, improvement is that mutation is much more granular, instead of just entire nodes to something completely random
     if random.random() < mutation_rate:
         return generate_random_tree(max_depth, variables, operators)
-    if isinstance(tree, OperatorNode): 
-        mutated_children = []
-        for child in tree.children:
-            mutated_child = mutate(child, max_depth, variables, operators, mutation_rate)
-            mutated_children.append(mutated_child)
-        return OperatorNode(tree.operator, mutated_children) #same operator, mutated children
-    elif random.random() < mutation_rate: #if leaf, small chance of new tree
-        return generate_random_tree(max_depth, variables, operators)
-    return tree #else, return unchanged
+
+    if isinstance(tree, ConstantNode): #slightly perturb the constant
+        if random.random() < mutation_rate:
+            delta = random.uniform(-1.0, 1.0)
+            return ConstantNode(tree.val + delta)
+        return tree
+
+    elif isinstance(tree, VariableNode): #with low prob, swap to a diff variable
+        if random.random() < mutation_rate:
+            return VariableNode(random.choice(variables))
+        return tree
+
+    elif isinstance(tree, OperatorNode): # With low prob, mutate operator to another of same arity
+        new_operator = tree.operator
+        if random.random() < mutation_rate:
+            same_arity_ops = [op for op in operators if operator_arity[op] == operator_arity[tree.operator]]
+            if same_arity_ops:
+                new_operator = random.choice(same_arity_ops)
+
+        mutated_children = [ #recursively mutate children
+            mutate(child, max_depth, variables, operators, mutation_rate)
+            for child in tree.children
+        ]
+        return OperatorNode(new_operator, mutated_children)
+
+    return tree
+
 
 def tournament_selection(population, fitnesses, tournament_size):
     #standard k tournament selection
@@ -47,16 +65,24 @@ def collect_all_nodes(tree):
 def get_random_subtree(tree): 
     return random.choice(collect_all_nodes(tree))
 
+def collect_all_paths(node, path=()):
+    """
+    Returns a list of all paths from root to every node (including internal nodes and leaves).
+    Each path is a tuple of child-indices, e.g. () for the root, (0,2) for root→child0→child2, etc.
+    """
+    paths = [path]
+    if isinstance(node, OperatorNode):
+        for idx, child in enumerate(node.children):
+            paths.extend(collect_all_paths(child, path + (idx,)))
+    return paths
+
 def collect_random_path(tree):
-    #we can't just say "node 7"
-    #we need a way to find that node starting from the root (directions to the crossover point)
-    #this function gives you [0, 1, 0], which says start at root, go to child 0, then child 1, then child 0
-    path = []
-    while isinstance(tree, OperatorNode) and tree.children:
-        idx = random.randint(0, len(tree.children) - 1)
-        path.append(idx)
-        tree = tree.children[idx]
-    return path
+    """
+    Chooses *any* node in the tree (root, internal, or leaf) at random.
+    """
+    all_paths = collect_all_paths(tree)
+    return list(random.choice(all_paths))
+
 def replace_subtree(tree, path, new_subtree):
     #walks along the path
     #replaces node found at the end of the path with the new_subtree
@@ -78,8 +104,8 @@ def crossover(tree1, tree2):
     # return tree1 with the replaced subtree of 2 at the crossover point
     tree1_copy = copy.deepcopy(tree1)
     tree2_copy = copy.deepcopy(tree2)
-    path = collect_random_path(tree1_copy) # Where to insert
-    new_subtree = get_random_subtree(tree2_copy)# What to insert
+    path = collect_random_path(tree1_copy) # where to insert
+    new_subtree = get_random_subtree(tree2_copy)# what to insert
     return replace_subtree(tree1_copy, path, copy.deepcopy(new_subtree))
 
 ##### Hard constraint for crossover tree depth: 
@@ -108,6 +134,7 @@ class Population:
         self.fitnessmsepairs = [fitness_canonicalization_customv1(tree, self.data_points, self.target_values) for tree in self.trees] 
         self.scores = [pair[0] for pair in self.fitnessmsepairs] #just fitness for selection
         self.immigration_rate = immigration_rate #added immigration (completely random trees introduced per generation)
+        self.mse_history = []  # store true MSEs across generations
 
     def evaluate(self): #for recalculating fitness scores for trees (updates self.scores using latest self.trees)
         self.fitnessmsepairs = [fitness_canonicalization_customv1(tree, self.data_points, self.target_values) for tree in self.trees]
@@ -123,11 +150,11 @@ class Population:
             scored = list(zip(self.trees, self.scores))
             scored.sort(key=lambda x: x[1])  # sort by fitness
 
-            # Elitism
+            # elitism
             elite_count = max(1, int(self.size * elite_fraction))
             new_trees = [copy.deepcopy(tree) for tree, _ in scored[:elite_count]]
 
-            # Fill the rest of the population
+            # fill the rest of the population
             while len(new_trees) < self.size:
                 # IMMIGRATION: with some chance, insert a new individual
                 if random.random() < self.immigration_rate:
@@ -148,6 +175,7 @@ class Population:
             self.evaluate()
 
             best_tree, best_fitness, best_mse = self.best_tree()
+            self.mse_history.append(best_mse)
             print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
 
 
@@ -190,44 +218,45 @@ class Population:
 # print("True MSE:", best_mse)
 
 
-#more complex target function
-# Target function: moderately complex
-def target_fn(x):
-    return x**2 + math.sin(x) + math.cos(x)
+# #more complex target function
+# # Target function: moderately complex
+# def target_fn(x):
+#     return math.sin(x) + math.log(x + 1) + math.sqrt(x) + 0.5 * (x ** 2)
 
-# Generate training data
-data_points = [{'x': x} for x in range(1, 200)]  # avoid x = 0 for log/sqrt
-target_values = [target_fn(dp['x']) for dp in data_points]
 
-# Define symbolic regression parameters
-variables = ['x']
-operators = ['+', '-', '*', '/', 'sin', 'cos', 'log', 'exp', '^']
-max_depth = 10
-lambda_parsimony = 0.1
-immigration_rate = 0.05  # 5% chance of injecting a new random individual
+# # Generate training data
+# data_points = [{'x': x} for x in range(1, 200)]  # avoid x = 0 for log/sqrt
+# target_values = [target_fn(dp['x']) for dp in data_points]
 
-# Initialize and run evolution
-pop = Population(
-    size=200,
-    max_depth=max_depth,
-    variables=variables,
-    operators=operators,
-    data_points=data_points,
-    target_values=target_values,
-    lambda_parsimony=lambda_parsimony,
-    immigration_rate=immigration_rate
-)
+# # Define symbolic regression parameters
+# variables = ['x']
+# operators = ['+', '-', '*', '/', 'sin', 'cos', 'log', 'exp', '^']
+# max_depth = 10
+# lambda_parsimony = 0.1
+# immigration_rate = 0.05  # 5% chance of injecting a new random individual
 
-pop.evolve(
-    generations=500,
-    tournament_size=5,
-    elite_fraction=0.1,
-    mutation_rate=0.1
-)
+# # Initialize and run evolution
+# pop = Population(
+#     size=200,
+#     max_depth=max_depth,
+#     variables=variables,
+#     operators=operators,
+#     data_points=data_points,
+#     target_values=target_values,
+#     lambda_parsimony=lambda_parsimony,
+#     immigration_rate=immigration_rate
+# )
 
-# Output best result
-best_tree, best_fitness, best_mse = pop.best_tree()
-print("\nBest Expression Found:")
-print(best_tree)
-print("Fitness (with parsimony penalty):", best_fitness)
-print("True MSE:", best_mse)
+# pop.evolve(
+#     generations=500,
+#     tournament_size=5,
+#     elite_fraction=0.1,
+#     mutation_rate=0.1
+# )
+
+# # Output best result
+# best_tree, best_fitness, best_mse = pop.best_tree()
+# print("\nBest Expression Found:")
+# print(best_tree)
+# print("Fitness (with parsimony penalty):", best_fitness)
+# print("True MSE:", best_mse)
