@@ -4,13 +4,13 @@ However, need to manually add rules
 
 Simplification here! (changing the actual tree itself)
 """
-
 from Canonicalization.FitnessFunction_Canon_Customv1 import fitness_canonicalization_customv1
 from SR_Setup.RandomTreeGeneration import generate_random_tree
 from SR_Setup.ExpressionTree import OperatorNode, tree_size
 import random
 import copy
 from Canonicalization.Canon_Customv1 import simplify
+import math
 
 
 def mutate(tree, max_depth, variables, operators,  mutation_rate):
@@ -137,7 +137,7 @@ class Population:
             self.evaluate()
             
             best_tree, best_fitness, best_mse = self.best_tree()
-            # print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
+            print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
             
 
 
@@ -177,4 +177,38 @@ class Population:
 # print(best_tree)
 # print("Fitness (with penalty):", best_fitness)
 # print("True MSE:", best_mse)
+
+
+#more complex target function
+def target_fn(x):
+    return math.sin(x) + math.log(x + 1) + math.sqrt(x) + 0.5 * (x ** 2)
+
+data_points = [{'x': x} for x in range(1, 200)]  # Avoid x = 0 for log/sqrt
+target_values = [target_fn(dp['x']) for dp in data_points]
+
+# Define problem parameters
+variables = ['x']
+operators = ['+', '-', '*', '/', 'sin', 'cos', 'log', 'exp', '^']
+max_depth = 10
+lambda_parsimony = 0.1
+
+# Initialize and evolve population
+pop = Population(
+    size=200,
+    max_depth=max_depth,
+    variables=variables,
+    operators=operators,
+    data_points=data_points,
+    target_values=target_values,
+    lambda_parsimony=lambda_parsimony
+)
+
+pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.9)
+
+# Output best expression
+best_tree, best_fitness, best_mse = pop.best_tree()
+print("\nBest Expression Found:")
+print(best_tree)
+print("Fitness (with parsimony penalty):", best_fitness)
+print("True MSE:", best_mse)
 

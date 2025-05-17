@@ -1,4 +1,4 @@
-from BasicSRTrees.RandomTreeGeneration import generate_random_tree, p_leaf_at_depth
+from SR_Setup.RandomTreeGeneration import generate_random_tree, p_leaf_at_depth
 import math
 
 def fitness(tree, data_points, target_values):

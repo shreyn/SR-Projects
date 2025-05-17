@@ -128,24 +128,21 @@ class Population:
             self.evaluate()
             
             best_tree, best_fitness, best_mse = self.best_tree()
-            #print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
+            print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
             
 
 
 
-
-
-# # Define target function: f(x) = x(x+1)/2
+# #more complex target function
 # def target_fn(x):
-#     return (x*(x+1)/2)
+#     return math.sin(x) + math.log(x + 1) + math.sqrt(x) + 0.5 * (x ** 2)
 
-# # Generate training data
-# data_points = [{'x': i} for i in range(50)]  # Inputs: x = 0 to 19
+# data_points = [{'x': x} for x in range(1, 50)]  # Avoid x = 0 for log/sqrt
 # target_values = [target_fn(dp['x']) for dp in data_points]
 
 # # Define problem parameters
 # variables = ['x']
-# operators = ['+', '-', '*', '/', 'sin']
+# operators = ['+', '-', '*', '/', 'sin', 'cos', 'log', 'exp', 'abs', 'sqrt', '^', 'max', 'min']
 # max_depth = 10
 # lambda_parsimony = 0.5
 
@@ -160,9 +157,9 @@ class Population:
 #     lambda_parsimony=lambda_parsimony
 # )
 
-# pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.2)
+# pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.1)
 
-# Output best expression
+# # Output best expression
 # best_tree, best_fitness, best_mse = pop.best_tree()
 # print("\nBest Expression Found:")
 # print(best_tree)
