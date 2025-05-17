@@ -20,12 +20,22 @@ def true_control_fn(e, e_dot):
 data_points = []
 target_values = []
 
-for _ in range(100):
-    e = random.uniform(-10, 10)
-    e_dot = random.uniform(-10, 10)
-    u = true_control_fn(e, e_dot)
-    data_points.append({'e': e, 'e_dot': e_dot})
+for _ in range(100): ## noisy data!
+    # true input (used to generate the target output)
+    e_true = random.uniform(-10, 10)
+    e_dot_true = random.uniform(-10, 10)
+    
+    # add noise to the input values (simulate sensor error)
+    e_noisy = e_true + random.gauss(0, 0.5)
+    e_dot_noisy = e_dot_true + random.gauss(0, 0.5)
+    
+    #use true inputs to generate output (want to learn the ideal system)
+    u = true_control_fn(e_true, e_dot_true)
+    
+    #store the noisy input and clean target
+    data_points.append({'e': e_noisy, 'e_dot': e_dot_noisy})
     target_values.append(u)
+
 
 # 3. Define SR parameters
 variables = ['e', 'e_dot']
