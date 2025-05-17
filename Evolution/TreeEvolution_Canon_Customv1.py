@@ -97,7 +97,7 @@ def crossover_with_depth_control(parent1, parent2, max_depth, variables, operato
 
 
 class Population:
-    def __init__(self, size, max_depth, variables, operators, data_points, target_values, lambda_parsimony=0.1):
+    def __init__(self, size, max_depth, variables, operators, data_points, target_values, lambda_parsimony=0.1, immigration_rate=0.05):
         self.size = size
         self.max_depth = max_depth
         self.variables = variables
@@ -107,6 +107,7 @@ class Population:
         self.trees = [generate_random_tree(max_depth, variables, operators) for _ in range(size)]
         self.fitnessmsepairs = [fitness_canonicalization_customv1(tree, self.data_points, self.target_values) for tree in self.trees] 
         self.scores = [pair[0] for pair in self.fitnessmsepairs] #just fitness for selection
+        self.immigration_rate = immigration_rate #added immigration (completely random trees introduced per generation)
 
     def evaluate(self): #for recalculating fitness scores for trees (updates self.scores using latest self.trees)
         self.fitnessmsepairs = [fitness_canonicalization_customv1(tree, self.data_points, self.target_values) for tree in self.trees]
@@ -120,25 +121,35 @@ class Population:
         for gen in range(generations):
             self.evaluate()
             scored = list(zip(self.trees, self.scores))
-            scored.sort(key=lambda x: x[1]) #pairs tree with fitness, sorts by best first
+            scored.sort(key=lambda x: x[1])  # sort by fitness
 
-            elite_count = max(1, int(self.size * elite_fraction)) #some fraction * pop size
-            new_trees = [copy.deepcopy(tree) for tree, _ in scored[:elite_count]] #add the best elite_count from curr pop. to next pop.
+            # Elitism
+            elite_count = max(1, int(self.size * elite_fraction))
+            new_trees = [copy.deepcopy(tree) for tree, _ in scored[:elite_count]]
 
-            while len(new_trees) < self.size: #keep creating offspring until population is full again
+            # Fill the rest of the population
+            while len(new_trees) < self.size:
+                # IMMIGRATION: with some chance, insert a new individual
+                if random.random() < self.immigration_rate:
+                    immigrant = generate_random_tree(self.max_depth, self.variables, self.operators)
+                    immigrant = simplify(immigrant)
+                    new_trees.append(immigrant)
+                    continue
+
+                # Otherwise evolve using crossover + mutation
                 parent1 = tournament_selection(self.trees, self.scores, tournament_size)
                 parent2 = tournament_selection(self.trees, self.scores, tournament_size)
                 child = crossover_with_depth_control(parent1, parent2, self.max_depth, self.variables, self.operators)
                 child = mutate(child, self.max_depth, self.variables, self.operators, mutation_rate)
-                child = simplify(child) #simplify child
-                new_trees.append(child) #add final child to next pop.
+                child = simplify(child)
+                new_trees.append(child)
 
-            self.trees = new_trees #replace old pop. with new pop.
+            self.trees = new_trees
             self.evaluate()
-            
+
             best_tree, best_fitness, best_mse = self.best_tree()
             print(f"Generation {gen + 1}: Fitness = {best_fitness:.4f}, True MSE = {best_mse:.4f}")
-            
+
 
 
 
@@ -180,19 +191,22 @@ class Population:
 
 
 #more complex target function
+# Target function: moderately complex
 def target_fn(x):
-    return math.sin(x) + math.log(x + 1) + math.sqrt(x) + 0.5 * (x ** 2)
+    return x**2 + math.sin(x) + math.cos(x)
 
-data_points = [{'x': x} for x in range(1, 200)]  # Avoid x = 0 for log/sqrt
+# Generate training data
+data_points = [{'x': x} for x in range(1, 200)]  # avoid x = 0 for log/sqrt
 target_values = [target_fn(dp['x']) for dp in data_points]
 
-# Define problem parameters
+# Define symbolic regression parameters
 variables = ['x']
 operators = ['+', '-', '*', '/', 'sin', 'cos', 'log', 'exp', '^']
 max_depth = 10
 lambda_parsimony = 0.1
+immigration_rate = 0.05  # 5% chance of injecting a new random individual
 
-# Initialize and evolve population
+# Initialize and run evolution
 pop = Population(
     size=200,
     max_depth=max_depth,
@@ -200,15 +214,20 @@ pop = Population(
     operators=operators,
     data_points=data_points,
     target_values=target_values,
-    lambda_parsimony=lambda_parsimony
+    lambda_parsimony=lambda_parsimony,
+    immigration_rate=immigration_rate
 )
 
-pop.evolve(generations=500, tournament_size=5, elite_fraction=0.1, mutation_rate=0.9)
+pop.evolve(
+    generations=500,
+    tournament_size=5,
+    elite_fraction=0.1,
+    mutation_rate=0.1
+)
 
-# Output best expression
+# Output best result
 best_tree, best_fitness, best_mse = pop.best_tree()
 print("\nBest Expression Found:")
 print(best_tree)
 print("Fitness (with parsimony penalty):", best_fitness)
 print("True MSE:", best_mse)
-
